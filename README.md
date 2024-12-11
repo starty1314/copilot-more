@@ -20,7 +20,7 @@ The exposed models aren't limited to coding tasks—you can connect any AI clien
 
     ```bash
     # 01ab8ac9400c4e429b23 is the client_id for the VS Code in Github, it's a fixed value, no need to change.
-    curl https://github.com/login/device/code -X POST -d 'client_id=01ab8ac9400c4e429b23&scope=user:email' | (grep -o 'device_code=[^&]*\|user_code=[^&]*' | sed 's/=/: /'; echo "Next command:"; echo "curl https://github.com/login/oauth/access_token -X POST -d 'client_id=01ab8ac9400c4e429b23&scope=user:email&device_code=$(grep -o 'device_code=[^&]*' <<< \"$(\!)\" | cut -d= -f2)&grant_type=urn:ietf:params:oauth:grant-type:device_code'| | grep -o 'access_token=[^&]*' | cut -d= -f2 | sed 's/^/$env:REFRESH_TOKEN = "/' | sed 's/$/"/'
+    curl https://github.com/login/device/code -X POST -d 'client_id=01ab8ac9400c4e429b23&scope=user:email' | (grep -o 'device_code=[^&]*\|user_code=[^&]*' | sed 's/=/: /'; echo "Next command:"; echo "curl https://github.com/login/oauth/access_token -X POST -d 'client_id=01ab8ac9400c4e429b23&scope=user:email&device_code=$(grep -o 'device_code=[^&]*' <<< \"$(\!)\" | cut -d= -f2)&grant_type=urn:ietf:params:oauth:grant-type:device_code'| | grep -o 'access_token=[^&]*' | cut -d= -f2 | sed 's/^/REFRESH_TOKEN = "/' | sed 's/$/"/'
 ")
     ```
 
