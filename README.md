@@ -16,41 +16,49 @@ The exposed models aren't limited to coding tasks—you can connect any AI clien
 
    A refresh token is used to get the access token. This token should never be shared with anyone :). You can get the refresh token by following the steps below:
 
-    - Run the following command and note down the returned `device_code` and `user_code`.:
+    - Run the following command and note down the returned `device_code`, `user_code` and the next command you need to run to get the access_token.:
 
     ```bash
-    # 01ab8ac9400c4e429b23 is the client_id for the VS Code
-    curl https://github.com/login/device/code -X POST -d 'client_id=01ab8ac9400c4e429b23&scope=user:email'
+    # 01ab8ac9400c4e429b23 is the client_id for the VS Code in Github, it's a fixed value, no need to change.
+    curl https://github.com/login/device/code -X POST -d 'client_id=01ab8ac9400c4e429b23&scope=user:email' | (grep -o 'device_code=[^&]*\|user_code=[^&]*' | sed 's/=/: /'; echo "Next command:"; echo "curl https://github.com/login/oauth/access_token -X POST -d 'client_id=01ab8ac9400c4e429b23&scope=user:email&device_code=$(grep -o 'device_code=[^&]*' <<< \"$(\!)\" | cut -d= -f2)&grant_type=urn:ietf:params:oauth:grant-type:device_code'| | grep -o 'access_token=[^&]*' | cut -d= -f2 | sed 's/^/$env:REFRESH_TOKEN = "/' | sed 's/$/"/'
+")
     ```
 
     - Open https://github.com/login/device/ and enter the `user_code`.
 
-    - Replace `YOUR_DEVICE_CODE` with the `device_code` obtained earlier and run:
-
-    ```bash
-    curl https://github.com/login/oauth/access_token -X POST -d 'client_id=01ab8ac9400c4e429b23&scope=user:email&device_code=YOUR_DEVICE_CODE&grant_type=urn:ietf:params:oauth:grant-type:device_code'
-    ```
-
-    - Note down the `access_token` starting with `gho_`.
+    - Run the "next command"
 
 
 2. Install and run copilot_more
 
     ```bash
     git clone https://github.com/jjleng/copilot-more.git
+    # Get into copilot-more root folder
     cd copilot-more
+    
     # install dependencies
+    pip install poetry
     poetry install
-    # run the server. Replace gho_xxxxx with the refresh token you got in the previous step. Note, you can use any port number you want.
-    REFRESH_TOKEN=gho_xxxxx poetry run uvicorn copilot_more.server:app --port 15432
+    
+    # run the server.
+       # 1. Set environment variable, use the output from the "next command".
+         # In Windows Powershell
+            $env:REFRESH_TOKEN =gho_xxxxx
+         # In Linux
+            REFRESH_TOKEN=gho_xxxxx
+       # 2. Set up the server, you can use any port number you want.
+          poetry run uvicorn copilot_more.server:app --port 15432
     ```
 
 
-## ✨ Magic Time
-Now you can connect Cline or any other AI client to `http://localhost:15432` and start coding with the power of GPT-4o and Claude-3.5-Sonnet without worrying about the cost. Note, the copilot-more manages the access token, you can use whatever string as API keys if Cline or the AI tools ask for one.
+3. AI IDE Configuration
+   * API Provider: OpenAI Compatible
+   * Base URL http://localhost:15432
+   * API Key: Anything
+   * Model ID: claude-3.5-sonnet
 
 
-## 🤔 Limitation
+## Limitation
 
 The GH Copilot models sit behind an API server that is not fully compatible with the OpenAI API. You cannot pass in a message like this:
 
