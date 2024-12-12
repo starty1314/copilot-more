@@ -33,7 +33,7 @@ The exposed models aren't limited to coding tasks—you can connect any AI clien
       echo "user_code: $USER_CODE"
       
       # Second command using the extracted device_code
-      echo "Next Command: curl -s https://github.com/login/oauth/access_token -X POST -d 'client_id=01ab8ac9400c4e429b23&scope=user:email&device_code=$DEVICE_CODE&grant_type=urn:ietf:params:oauth:grant-type:device_code' | grep -oP '(?<=access_token=)[^&]*' | sed    's/.*/REFRESH_TOKEN=&/'"
+      echo "Next Command: curl -s https://github.com/login/oauth/access_token -X POST -d 'client_id=01ab8ac9400c4e429b23&scope=user:email&device_code=$DEVICE_CODE&grant_type=urn:ietf:params:oauth:grant-type:device_code' | grep -oP '(?<=access_token=)[^&]*' | sed    's/.*/export REFRESH_TOKEN=&/'"
     ```
     - Open https://github.com/login/device/ and enter the `user_code`.
 
