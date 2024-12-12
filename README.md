@@ -16,41 +16,52 @@ The exposed models aren't limited to coding tasks—you can connect any AI clien
 
    A refresh token is used to get the access token. This token should never be shared with anyone :). You can get the refresh token by following the steps below:
 
-    - Run the following command and note down the returned `device_code`, `user_code` and the `next command` you need to run to get the access_token.:
+    - Run the following command and note down the returned `device_code` and `user_code`. 01ab8ac9400c4e429b23 is the client_id for the VS Code in Github, it's a fixed value, no need to change.
 
     ```bash
-    # 01ab8ac9400c4e429b23 is the client_id for the VS Code in Github, it's a fixed value, no need to change.
-    curl https://github.com/login/device/code -X POST -d 'client_id=01ab8ac9400c4e429b23&scope=user:email' | (grep -o 'device_code=[^&]*\|user_code=[^&]*' | sed 's/=/: /'; echo "Next command:"; echo "curl https://github.com/login/oauth/access_token -X POST -d 'client_id=01ab8ac9400c4e429b23&scope=user:email&device_code=$(grep -o 'device_code=[^&]*' <<< \"$(\!)\" | cut -d= -f2)&grant_type=urn:ietf:params:oauth:grant-type:device_code'| | grep -o 'access_token=[^&]*' | cut -d= -f2 | sed 's/^/REFRESH_TOKEN = "/' | sed 's/$/"/'")
+    curl -s https://github.com/login/device/code -X POST -d 'client_id=01ab8ac9400c4e429b23&scope=user:email' | grep -o 'device_code=[^&]*\|user_code=[^&]*'
     ```
-
     - Open https://github.com/login/device/ and enter the `user_code`.
 
-    - Run the `next command`
-
+    - Replace the `device_code` in the following command
+      
+    ```bash
+    curl -s https://github.com/login/oauth/access_token -X POST -d 'client_id=01ab8ac9400c4e429b23&scope=user:email&device_code=[device_code ]&grant_type=urn:ietf:params:oauth:grant-type:device_code' | grep -oP '(?<=access_token=)[^&]*' | sed 's/.*/REFRESH_TOKEN=&/'
+    ```
 
 2. Install and run copilot_more
 
     ```bash
     git clone https://github.com/jjleng/copilot-more.git
-    # Get into copilot-more root folder
-    cd copilot-more
+    ```
     
-    # install dependencies
+    # Get into copilot-more root folder
+    ```bash
+    cd copilot-more
+    ```
+   
+    # Install dependencies
+    ```bash
     pip install poetry
     poetry install
-    
-    # run the server.
-       # 1. Set environment variable, use the output from the "next command".
-         # In Windows Powershell
-            $env:REFRESH_TOKEN =gho_xxxxx
-         # In Linux
-            REFRESH_TOKEN=gho_xxxxx
-       # 2. Set up the server, you can use any port number you want.
-          poetry run uvicorn copilot_more.server:app --port 15432
     ```
+   
+    # Set environment variable and start the server.
+      # In Windows Powershell
+      ```bash
+      $env:REFRESH_TOKEN =gho_xxxxx
+      ```
+      # In Linux
+      ```bash
+      REFRESH_TOKEN=gho_xxxxx
+      ```
+      # You can use any port number you want.
+      ```bash
+      poetry run uvicorn copilot_more.server:app --port 15432
+      ```
 
 
-3. AI IDE Configuration
+4. AI IDE Configuration
    * API Provider: OpenAI Compatible
    * Base URL http://localhost:15432
    * API Key: Anything
