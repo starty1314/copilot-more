@@ -63,7 +63,7 @@ The exposed models aren't limited to coding tasks—you can connect any AI clien
       ```
       # In Linux
       ```bash
-      REFRESH_TOKEN=gho_xxxxx
+      export REFRESH_TOKEN=gho_xxxxx
       ```
       # You can use any port number you want, default uvicorn bind to 127.0.0.1, which only allows localhost access, by specifying a host 0.0.0.0, it will allow external connection.
       ```bash
